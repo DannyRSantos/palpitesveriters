@@ -4,35 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Palpite Veriters_</title>
-  <script>
-    // Carrega Supabase dinamicamente com fallback
-    (function() {
-      var s = document.createElement('script');
-      s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
-      s.onload = function() { window._supabaseReady = true; };
-      s.onerror = function() {
-        var s2 = document.createElement('script');
-        s2.src = 'https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js';
-        s2.onload = function() { window._supabaseReady = true; };
-        document.head.appendChild(s2);
-      };
-      document.head.appendChild(s);
-    })();
-  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f3f4f6; min-height: 100vh; color: #111; }
-    :root {
-      --brand: #1C4EF5;
-      --brand-dark: #0F35C2;
-      --brand-light: #E8EFFE;
-    }
+    :root { --brand: #1C4EF5; --brand-dark: #0F35C2; --brand-light: #E8EFFE; }
     .wrap { max-width: 480px; margin: 0 auto; padding: 1rem; }
     input { width: 100%; padding: 9px 12px; border: 1px solid #CBD5F5; border-radius: 8px; font-size: 14px; outline: none; background: #fff; color: #111; }
     input:focus { border-color: var(--brand); }
     input:disabled { background: #f3f4f6; color: #999; }
-    .btn-primary { background: var(--brand); color: #fff; border: none; border-radius: 8px; padding: 10px 20px; font-size: 14px; font-weight: 600; cursor: pointer; width: 100%; }
-    .btn-secondary { background: transparent; color: var(--brand); border: 1px solid var(--brand); border-radius: 8px; padding: 9px 20px; font-size: 14px; font-weight: 500; cursor: pointer; width: 100%; }
+    .btn-primary { background: var(--brand); color: #fff; border: none; border-radius: 8px; padding: 10px 20px; font-size: 14px; font-weight: 600; cursor: pointer; width: 100%; margin-bottom: 8px; }
+    .btn-secondary { background: transparent; color: var(--brand); border: 1px solid var(--brand); border-radius: 8px; padding: 9px 20px; font-size: 14px; font-weight: 500; cursor: pointer; width: 100%; margin-bottom: 8px; }
     .btn-small { background: var(--brand-light); color: var(--brand-dark); border: none; border-radius: 6px; padding: 5px 10px; font-size: 12px; font-weight: 500; cursor: pointer; }
     .btn-danger { background: transparent; color: #dc2626; border: 0.5px solid #ddd; border-radius: 8px; padding: 5px 10px; font-size: 12px; cursor: pointer; }
     .btn-inline { background: var(--brand); color: #fff; border: none; border-radius: 8px; padding: 9px 16px; font-size: 13px; font-weight: 600; cursor: pointer; }
@@ -58,531 +40,455 @@
     .ranking-row { display: flex; align-items: center; gap: 12px; }
     .rank-num { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
     .divider { border: none; border-top: 0.5px solid #e5e7eb; margin: 8px 0; }
-    .guess-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 0.5px solid #e5e7eb; font-size: 13px; }
+    .guess-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 0.5px solid #e5e7eb; font-size: 13px; gap: 4px; }
+    .link-btn { background: none; border: none; color: var(--brand); font-size: 13px; cursor: pointer; text-decoration: underline; }
   </style>
 </head>
 <body>
 <div class="wrap">
-  <div id="app"></div>
+  <div id="app"><div style="padding:2rem;text-align:center;color:#6b7280;">Carregando...</div></div>
 </div>
-
 <script>
-const sb = supabase.createClient(
-  'https://jwwcnarwvixszidaaphs.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp3d2NuYXJ3dml4c3ppZGFhcGhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwMTA4ODksImV4cCI6MjA5NjU4Njg4OX0.9VRB_zjcSCMIOAHdmsDR_pINPEdbcCRGp96RiJ5B5kQ'
-);
+var ADMIN_EMAIL = 'dani@verity.com';
+var ADMIN_PASS = 'verity2026';
+var DEADLINE_MS = 30 * 60 * 1000;
 
-const ADMIN_EMAIL = 'dani@verity.com';
-const DEADLINE_OFFSET_MS = 30 * 60 * 1000;
-
-const GAMES = [
-  { id: 1, date: '13/06', weekday: 'sábado',       time: '19h00', home: 'Brasil',  away: 'Marrocos', kickoff: new Date('2026-06-13T19:00:00-03:00') },
-  { id: 2, date: '19/06', weekday: 'sexta-feira',  time: '21h30', home: 'Brasil',  away: 'Haiti',    kickoff: new Date('2026-06-19T21:30:00-03:00') },
-  { id: 3, date: '24/06', weekday: 'quarta-feira', time: '19h00', home: 'Escócia', away: 'Brasil',   kickoff: new Date('2026-06-24T19:00:00-03:00') },
+var GAMES = [
+  { id: 1, date: '13/06', weekday: 'sábado',       time: '19h00', home: 'Brasil',  away: 'Marrocos', kickoff: new Date('2026-06-13T22:00:00Z') },
+  { id: 2, date: '19/06', weekday: 'sexta-feira',  time: '21h30', home: 'Brasil',  away: 'Haiti',    kickoff: new Date('2026-06-20T00:30:00Z') },
+  { id: 3, date: '24/06', weekday: 'quarta-feira', time: '19h00', home: 'Escócia', away: 'Brasil',   kickoff: new Date('2026-06-24T22:00:00Z') },
 ];
 
-function isOpen(game) { return new Date() < new Date(game.kickoff.getTime() - DEADLINE_OFFSET_MS); }
+function isOpen(game) { return new Date() < new Date(game.kickoff.getTime() - DEADLINE_MS); }
 
 function calcPoints(gh, ga, rh, ra) {
   gh = parseInt(gh); ga = parseInt(ga); rh = parseInt(rh); ra = parseInt(ra);
   if (gh === rh && ga === ra) return 5;
-  const gW = gh > ga ? 'H' : gh < ga ? 'A' : 'D';
-  const rW = rh > ra ? 'H' : rh < ra ? 'A' : 'D';
-  let pts = 0;
+  var gW = gh > ga ? 'H' : gh < ga ? 'A' : 'D';
+  var rW = rh > ra ? 'H' : rh < ra ? 'A' : 'D';
+  var pts = 0;
   if (gW === rW) pts += 3;
   else { if (gh === rh) pts += 1; if (ga === ra) pts += 1; }
   return pts;
 }
 
-// SVG Flags
 function flagSVG(country) {
-  const svgs = {
-    Brasil: `<svg width="67" height="48" viewBox="0 0 280 196" xmlns="http://www.w3.org/2000/svg">
-      <rect width="280" height="196" fill="#009C3B" rx="6"/>
-      <polygon points="140,16 268,98 140,180 12,98" fill="#FFDF00"/>
-      <circle cx="140" cy="98" r="56" fill="#003087"/>
-      <rect x="84" y="91" width="112" height="14" fill="white"/>
-      <text x="140" y="102" text-anchor="middle" font-size="7.5" font-weight="bold" fill="#006400" font-family="sans-serif" letter-spacing="1">ORDEM E PROGRESSO</text>
-    </svg>`,
-    Marrocos: `<svg width="67" height="48" viewBox="0 0 280 196" xmlns="http://www.w3.org/2000/svg">
-      <rect width="280" height="196" fill="#C1272D" rx="6"/>
-      <polygon points="140,72 148,96 174,96 153,111 161,135 140,120 119,135 127,111 106,96 132,96" fill="none" stroke="#006233" stroke-width="4"/>
-    </svg>`,
-    Haiti: `<svg width="67" height="48" viewBox="0 0 280 196" xmlns="http://www.w3.org/2000/svg">
-      <rect width="280" height="196" fill="#D21034" rx="6"/>
-      <rect width="280" height="98" fill="#00209F"/>
-      <rect x="110" y="72" width="60" height="52" fill="white"/>
-      <rect x="110" y="72" width="60" height="26" fill="#00209F"/>
-      <rect x="110" y="98" width="60" height="26" fill="#D21034"/>
-      <line x1="140" y1="56" x2="140" y2="124" stroke="#006B3F" stroke-width="4"/>
-      <ellipse cx="140" cy="58" rx="10" ry="15" fill="#006B3F"/>
-    </svg>`,
-    Escócia: `<svg width="67" height="48" viewBox="0 0 280 196" xmlns="http://www.w3.org/2000/svg">
-      <rect width="280" height="196" fill="#005EB8" rx="6"/>
-      <line x1="0" y1="0" x2="280" y2="196" stroke="white" stroke-width="38"/>
-      <line x1="280" y1="0" x2="0" y2="196" stroke="white" stroke-width="38"/>
-    </svg>`,
+  var flags = {
+    Brasil: '<svg width="67" height="48" viewBox="0 0 280 196" xmlns="http://www.w3.org/2000/svg"><rect width="280" height="196" fill="#009C3B" rx="6"/><polygon points="140,16 268,98 140,180 12,98" fill="#FFDF00"/><circle cx="140" cy="98" r="56" fill="#003087"/><rect x="84" y="91" width="112" height="14" fill="white"/><text x="140" y="102" text-anchor="middle" font-size="7.5" font-weight="bold" fill="#006400" font-family="sans-serif" letter-spacing="1">ORDEM E PROGRESSO</text></svg>',
+    Marrocos: '<svg width="67" height="48" viewBox="0 0 280 196" xmlns="http://www.w3.org/2000/svg"><rect width="280" height="196" fill="#C1272D" rx="6"/><polygon points="140,72 148,96 174,96 153,111 161,135 140,120 119,135 127,111 106,96 132,96" fill="none" stroke="#006233" stroke-width="4"/></svg>',
+    Haiti: '<svg width="67" height="48" viewBox="0 0 280 196" xmlns="http://www.w3.org/2000/svg"><rect width="280" height="196" fill="#D21034" rx="6"/><rect width="280" height="98" fill="#00209F"/><rect x="110" y="72" width="60" height="52" fill="white"/><rect x="110" y="72" width="60" height="26" fill="#00209F"/><rect x="110" y="98" width="60" height="26" fill="#D21034"/><line x1="140" y1="56" x2="140" y2="124" stroke="#006B3F" stroke-width="4"/><ellipse cx="140" cy="58" rx="10" ry="15" fill="#006B3F"/></svg>',
+    'Escócia': '<svg width="67" height="48" viewBox="0 0 280 196" xmlns="http://www.w3.org/2000/svg"><rect width="280" height="196" fill="#005EB8" rx="6"/><line x1="0" y1="0" x2="280" y2="196" stroke="white" stroke-width="38"/><line x1="280" y1="0" x2="0" y2="196" stroke="white" stroke-width="38"/></svg>',
   };
-  return svgs[country] || '';
+  return flags[country] || '';
 }
 
-// State
-let state = { screen: 'login', user: null, tab: 'jogos', guesses: [], results: {}, users: [], rankData: [] };
+var state = { screen: 'login', user: null, tab: 'jogos', guesses: [], results: {}, users: [], lastEmail: '' };
+var sb;
 
-function setState(patch) { Object.assign(state, patch); render(); }
+function setState(patch) {
+  Object.assign(state, patch);
+  render();
+}
 
-function flash(text, type = 'success') {
-  const el = document.getElementById('msg');
+function flash(text, type) {
+  var el = document.getElementById('msg');
   if (!el) return;
-  el.className = type === 'danger' ? 'msg-danger' : 'msg-success';
+  el.className = (type === 'danger') ? 'msg-danger' : 'msg-success';
   el.textContent = text;
   el.classList.remove('hidden');
-  setTimeout(() => el.classList.add('hidden'), 3000);
+  setTimeout(function() { el.classList.add('hidden'); }, 3000);
 }
 
-// Supabase calls
-async function dbGetGuesses() {
-  const { data } = await sb.from('guesses').select('*');
-  return data || [];
+function msgDiv() { return '<div id="msg" class="hidden"></div>'; }
+
+function verity(size) {
+  return '<span style="font-size:' + size + 'px;font-weight:700;color:var(--brand);letter-spacing:-0.5px;">verity</span>';
 }
-async function dbGetResults() {
-  const { data } = await sb.from('results').select('*');
-  const map = {};
-  (data || []).forEach(r => { map[r.game_id] = { home: r.home, away: r.away }; });
-  return map;
+
+// DB helpers
+function dbGetGuesses(cb) { sb.from('guesses').select('*').then(function(r) { cb(r.data || []); }); }
+function dbGetResults(cb) {
+  sb.from('results').select('*').then(function(r) {
+    var map = {};
+    (r.data || []).forEach(function(x) { map[x.game_id] = { home: x.home, away: x.away }; });
+    cb(map);
+  });
 }
-async function dbGetUsers() {
-  const { data } = await sb.from('users').select('*');
-  return data || [];
-}
-async function dbUpsertGuess(gameId, email, name, home, away) {
-  await sb.from('guesses').upsert({ game_id: gameId, email, name, home, away }, { onConflict: 'game_id,email' });
-}
-async function dbUpsertResult(gameId, home, away) {
-  await sb.from('results').upsert({ game_id: gameId, home, away }, { onConflict: 'game_id' });
-}
-async function dbDeleteGuess(gameId, email) {
-  await sb.from('guesses').delete().eq('game_id', gameId).eq('email', email);
-}
-async function dbDeleteUser(email) {
-  await sb.from('guesses').delete().eq('email', email);
-  await sb.from('users').delete().eq('email', email);
-}
-async function dbUpdateUser(origEmail, name, email, pass) {
-  const upd = { name, email };
-  if (pass) upd.pass = pass;
-  await sb.from('users').update(upd).eq('email', origEmail);
-  await sb.from('guesses').update({ email, name }).eq('email', origEmail);
+function dbGetUsers(cb) { sb.from('users').select('*').then(function(r) { cb(r.data || []); }); }
+
+function loadAll(cb) {
+  dbGetGuesses(function(guesses) {
+    dbGetResults(function(results) {
+      dbGetUsers(function(users) {
+        cb(guesses, results, users);
+      });
+    });
+  });
 }
 
 function getRanking() {
-  const totals = {};
-  state.users.forEach(u => { totals[u.email] = { name: u.name, pts: 0 }; });
-  state.guesses.forEach(g => {
-    const res = state.results[g.game_id];
-    const pts = res ? calcPoints(g.home, g.away, res.home, res.away) : 0;
+  var totals = {};
+  state.users.forEach(function(u) { totals[u.email] = { name: u.name, pts: 0 }; });
+  state.guesses.forEach(function(g) {
+    var res = state.results[g.game_id];
+    var pts = res ? calcPoints(g.home, g.away, res.home, res.away) : 0;
     if (!totals[g.email]) totals[g.email] = { name: g.name, pts: 0 };
     totals[g.email].pts += pts || 0;
   });
-  return Object.values(totals).sort((a, b) => b.pts - a.pts);
+  return Object.values(totals).sort(function(a, b) { return b.pts - a.pts; });
 }
 
 // Render
 function render() {
-  const app = document.getElementById('app');
-  const s = state;
-  if (s.screen === 'login') { app.innerHTML = renderLogin(); bindLogin(); return; }
-  if (s.screen === 'forgot') { app.innerHTML = renderForgot(); bindForgot(); return; }
+  var app = document.getElementById('app');
+  if (state.screen === 'login')    { app.innerHTML = renderLogin();    bindLogin();    return; }
+  if (state.screen === 'register') { app.innerHTML = renderRegister(); bindRegister(); return; }
+  if (state.screen === 'forgot')   { app.innerHTML = renderForgot();   bindForgot();   return; }
   app.innerHTML = renderApp();
   bindApp();
 }
 
-function msgDiv() { return `<div id="msg" class="hidden"></div>`; }
-
-function verity(size = 22) {
-  return `<span style="font-size:${size}px;font-weight:700;color:var(--brand);letter-spacing:-0.5px;">verity</span>`;
+function renderLogin() {
+  return '<div style="max-width:380px;margin:2rem auto;">' +
+    '<div style="border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(28,78,245,0.10);">' +
+      '<div class="banner" style="text-align:center;padding:28px 24px 32px;">' +
+        verity(28) + '<br>' +
+        '<div style="font-size:20px;font-weight:800;color:#fff;margin-top:6px;">Palpite Veriters_</div>' +
+        '<div style="font-size:13px;color:rgba(255,255,255,0.75);margin-top:4px;">#RumoaoHexa 🏆</div>' +
+      '</div>' +
+      '<div style="background:#fff;border-radius:0 0 16px 16px;padding:24px 20px;">' +
+        msgDiv() +
+        '<div class="field"><label>E-mail</label><input id="l-email" type="email" placeholder="seu@verity.com" value="' + (state.lastEmail || '') + '"/></div>' +
+        '<div class="field"><label>Senha</label><input id="l-pass" type="password" placeholder="••••••"/></div>' +
+        '<button class="btn-primary" id="btn-login">Entrar</button>' +
+        '<button class="btn-secondary" id="btn-go-register">Criar conta</button>' +
+        '<div style="text-align:center;margin-top:4px;"><button class="link-btn" id="btn-go-forgot">Esqueci minha senha</button></div>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
 }
 
-function renderLogin() {
-  return `
-  <div style="max-width:380px;margin:2rem auto;">
-    <div style="border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(28,78,245,0.10);">
-      <div class="banner" style="text-align:center;padding:28px 24px 32px;">
-        ${verity(28)}<br>
-        <div style="font-size:20px;font-weight:800;color:#fff;margin-top:6px;">Palpite Veriters_</div>
-        <div style="font-size:13px;color:rgba(255,255,255,0.75);margin-top:4px;">#RumoaoHexa 🏆</div>
-      </div>
-      <div style="background:#fff;border-radius:0 0 16px 16px;padding:24px 20px;">
-        ${msgDiv()}
-        <div class="field"><label>E-mail</label><input id="l-email" type="email" placeholder="seu@verity.com" value="${state.lastEmail || ''}"/></div>
-        <div class="field"><label>Senha</label><input id="l-pass" type="password" placeholder="••••••"/></div>
-        <button class="btn-primary" id="btn-login" style="margin-bottom:8px;">Entrar</button>
-        <button class="btn-secondary" id="btn-go-register" style="margin-bottom:8px;">Criar conta</button>
-        <div style="text-align:center;">
-          <button id="btn-go-forgot" style="background:none;border:none;color:var(--brand);font-size:13px;cursor:pointer;text-decoration:underline;">Esqueci minha senha</button>
-        </div>
-      </div>
-    </div>
-  </div>`;
+function renderRegister() {
+  return '<div style="max-width:380px;margin:2rem auto;">' +
+    '<div style="border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(28,78,245,0.10);">' +
+      '<div class="banner" style="text-align:center;padding:28px 24px 32px;">' +
+        verity(28) + '<br>' +
+        '<div style="font-size:18px;font-weight:800;color:#fff;margin-top:6px;">Criar conta</div>' +
+        '<div style="font-size:13px;color:rgba(255,255,255,0.75);margin-top:4px;">Palpite Veriters_</div>' +
+      '</div>' +
+      '<div style="background:#fff;border-radius:0 0 16px 16px;padding:24px 20px;">' +
+        msgDiv() +
+        '<div class="field"><label>Nome</label><input id="r-name" type="text" placeholder="Seu nome"/></div>' +
+        '<div class="field"><label>E-mail</label><input id="r-email" type="email" placeholder="seu@verity.com"/></div>' +
+        '<div class="field"><label>Senha</label><input id="r-pass" type="password" placeholder="••••••"/></div>' +
+        '<div class="field"><label>Confirmar senha</label><input id="r-pass2" type="password" placeholder="••••••"/></div>' +
+        '<button class="btn-primary" id="btn-register">Cadastrar</button>' +
+        '<button class="btn-secondary" id="btn-go-login">Voltar ao login</button>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
 }
 
 function renderForgot() {
-  return `
-  <div style="max-width:380px;margin:2rem auto;">
-    <div style="border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(28,78,245,0.10);">
-      <div class="banner" style="text-align:center;padding:28px 24px 32px;">
-        ${verity(28)}<br>
-        <div style="font-size:18px;font-weight:800;color:#fff;margin-top:6px;">Redefinir senha</div>
-        <div style="font-size:13px;color:rgba(255,255,255,0.75);margin-top:4px;">Palpite Veriters_</div>
-      </div>
-      <div style="background:#fff;border-radius:0 0 16px 16px;padding:24px 20px;">
-        ${msgDiv()}
-        <div id="forgot-step1">
-          <div class="field"><label>E-mail cadastrado</label><input id="f-email" type="email" placeholder="seu@verity.com"/></div>
-          <button class="btn-primary" id="btn-check-email" style="margin-bottom:8px;">Continuar</button>
-          <button class="btn-secondary" id="btn-back-login">Voltar ao login</button>
-        </div>
-        <div id="forgot-step2" style="display:none;">
-          <div class="field"><label>Nova senha</label><input id="f-pass" type="password" placeholder="••••••"/></div>
-          <div class="field"><label>Confirmar nova senha</label><input id="f-pass2" type="password" placeholder="••••••"/></div>
-          <button class="btn-primary" id="btn-reset-pass" style="margin-bottom:8px;">Salvar nova senha</button>
-          <button class="btn-secondary" id="btn-back-login2">Voltar ao login</button>
-        </div>
-      </div>
-    </div>
-  </div>`;
-}
-
-  return `
-  <div style="max-width:380px;margin:2rem auto;">
-    <div style="border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(28,78,245,0.10);">
-      <div class="banner" style="text-align:center;padding:28px 24px 32px;">
-        ${verity(28)}<br>
-        <div style="font-size:18px;font-weight:800;color:#fff;margin-top:6px;">Criar conta</div>
-        <div style="font-size:13px;color:rgba(255,255,255,0.75);margin-top:4px;">Palpite Veriters_</div>
-      </div>
-      <div style="background:#fff;border-radius:0 0 16px 16px;padding:24px 20px;">
-        ${msgDiv()}
-        <div class="field"><label>Nome</label><input id="r-name" type="text" placeholder="Seu nome"/></div>
-        <div class="field"><label>E-mail</label><input id="r-email" type="email" placeholder="seu@verity.com"/></div>
-        <div class="field"><label>Senha</label><input id="r-pass" type="password" placeholder="••••••"/></div>
-        <div class="field"><label>Confirmar senha</label><input id="r-pass2" type="password" placeholder="••••••"/></div>
-        <button class="btn-primary" id="btn-register" style="margin-bottom:8px;">Cadastrar</button>
-        <button class="btn-secondary" id="btn-go-login">Voltar ao login</button>
-      </div>
-    </div>
-  </div>`;
+  return '<div style="max-width:380px;margin:2rem auto;">' +
+    '<div style="border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(28,78,245,0.10);">' +
+      '<div class="banner" style="text-align:center;padding:28px 24px 32px;">' +
+        verity(28) + '<br>' +
+        '<div style="font-size:18px;font-weight:800;color:#fff;margin-top:6px;">Redefinir senha</div>' +
+      '</div>' +
+      '<div style="background:#fff;border-radius:0 0 16px 16px;padding:24px 20px;">' +
+        msgDiv() +
+        '<div id="forgot-step1">' +
+          '<div class="field"><label>E-mail cadastrado</label><input id="f-email" type="email" placeholder="seu@verity.com"/></div>' +
+          '<button class="btn-primary" id="btn-check-email">Continuar</button>' +
+          '<button class="btn-secondary" id="btn-back-login">Voltar ao login</button>' +
+        '</div>' +
+        '<div id="forgot-step2" style="display:none;">' +
+          '<div class="field"><label>Nova senha</label><input id="f-pass" type="password" placeholder="••••••"/></div>' +
+          '<div class="field"><label>Confirmar nova senha</label><input id="f-pass2" type="password" placeholder="••••••"/></div>' +
+          '<button class="btn-primary" id="btn-reset-pass">Salvar nova senha</button>' +
+          '<button class="btn-secondary" id="btn-back-login2">Voltar ao login</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
 }
 
 function renderApp() {
-  const isAdmin = state.user.email === ADMIN_EMAIL;
-  const tabs = isAdmin
+  var isAdmin = state.user.email === ADMIN_EMAIL;
+  var tabs = isAdmin
     ? [['jogos','Jogos'],['ranking','Ranking'],['admin','Admin']]
     : [['jogos','Jogos'],['ranking','Ranking']];
-
-  return `
-  <div style="border-radius:16px 16px 0 0;background:var(--brand);padding:20px 24px 0;">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
-      <div>
-        ${verity(18)}
-        <div style="font-size:15px;font-weight:800;color:#fff;">Palpite Veriters_</div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.7);">#RumoaoHexa · ${state.user.name}${isAdmin ? ' · Admin' : ''}</div>
-      </div>
-      <button id="btn-logout" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.4);color:#fff;border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;">Sair</button>
-    </div>
-    <div style="display:flex;gap:4px;">
-      ${tabs.map(([id, label]) => `<button class="tab-btn${state.tab === id ? ' active' : ''}" data-tab="${id}">${label}</button>`).join('')}
-    </div>
-  </div>
-  <div class="content-area">
-    ${msgDiv()}
-    ${state.tab === 'jogos' ? renderJogos(isAdmin) : ''}
-    ${state.tab === 'ranking' ? renderRanking() : ''}
-    ${state.tab === 'admin' && isAdmin ? renderAdmin() : ''}
-  </div>`;
+  var tabsHtml = tabs.map(function(t) {
+    return '<button class="tab-btn' + (state.tab === t[0] ? ' active' : '') + '" data-tab="' + t[0] + '">' + t[1] + '</button>';
+  }).join('');
+  var content = '';
+  if (state.tab === 'jogos')   content = renderJogos(isAdmin);
+  if (state.tab === 'ranking') content = renderRanking();
+  if (state.tab === 'admin' && isAdmin) content = renderAdmin();
+  return '<div style="border-radius:16px 16px 0 0;background:var(--brand);padding:20px 24px 0;">' +
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">' +
+      '<div>' + verity(16) +
+        '<div style="font-size:15px;font-weight:800;color:#fff;">Palpite Veriters_</div>' +
+        '<div style="font-size:11px;color:rgba(255,255,255,0.7);">#RumoaoHexa · ' + state.user.name + (isAdmin ? ' · Admin' : '') + '</div>' +
+      '</div>' +
+      '<button id="btn-logout" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.4);color:#fff;border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;">Sair</button>' +
+    '</div>' +
+    '<div style="display:flex;gap:4px;">' + tabsHtml + '</div>' +
+  '</div>' +
+  '<div class="content-area">' + msgDiv() + content + '</div>';
 }
 
 function renderJogos(isAdmin) {
-  return GAMES.map(game => {
-    const open = isOpen(game);
-    const myGuess = state.guesses.find(g => g.game_id === game.id && g.email === state.user.email);
-    const result = state.results[game.id];
-    const myPts = myGuess && result ? calcPoints(myGuess.home, myGuess.away, result.home, result.away) : null;
-    const deadline = new Date(game.kickoff.getTime() - DEADLINE_OFFSET_MS);
-    const deadlineStr = deadline.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
-    const gh = myGuess ? myGuess.home : '';
-    const ga = myGuess ? myGuess.away : '';
-    return `
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-        <div style="display:inline-flex;align-items:center;gap:6px;background:var(--brand-light);border-radius:999px;padding:4px 12px;color:var(--brand);font-size:12px;font-weight:500;">
-          📅 ${game.date}, ${game.weekday}, às ${game.time}
-        </div>
-        <span class="${open ? 'badge-open' : 'badge-closed'}">${open ? 'Aberto' : 'Encerrado'}</span>
-      </div>
-      <div class="teams-row">
-        <div class="flag-wrap">${flagSVG(game.home)}<div class="country-name">${game.home}</div></div>
-        <div style="font-weight:800;font-size:20px;color:#6b7280;">×</div>
-        <div class="flag-wrap">${flagSVG(game.away)}<div class="country-name">${game.away}</div></div>
-      </div>
-      <hr class="divider">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:${result ? '10px' : '0'};">
-        <span style="font-size:12px;color:#6b7280;">${open ? `Palpites até ${deadlineStr} (30 min antes)` : 'Prazo encerrado'}</span>
-      </div>
-      ${result ? `<div style="margin-bottom:10px;font-size:13px;padding:8px 12px;background:var(--brand-light);border-radius:8px;display:flex;justify-content:space-between;align-items:center;">
-        <span style="color:var(--brand-dark);">Resultado: <strong>${result.home} × ${result.away}</strong></span>
-        ${myPts !== null ? `<span class="badge-pts">+${myPts} pts</span>` : ''}
-      </div>` : ''}
-      ${!isAdmin ? `
-      <div style="margin-top:10px;">
-        <div style="font-size:12px;color:#6b7280;margin-bottom:8px;">💬 Seu palpite de placar</div>
-        <div class="row">
-          <input type="number" min="0" max="20" class="score-input" id="gh-${game.id}" value="${gh}" ${!open ? 'disabled' : ''} placeholder="0"/>
-          <span class="sep">×</span>
-          <input type="number" min="0" max="20" class="score-input" id="ga-${game.id}" value="${ga}" ${!open ? 'disabled' : ''} placeholder="0"/>
-          ${open ? `<button class="btn-inline" data-save-guess="${game.id}" style="flex:1;">Salvar palpite</button>` : ''}
-        </div>
-        ${myGuess ? `<div style="font-size:12px;color:var(--brand);margin-top:8px;font-weight:600;">✓ Registrado: ${game.home} ${myGuess.home} × ${myGuess.away} ${game.away}</div>` : ''}
-      </div>` : ''}
-    </div>`;
+  return GAMES.map(function(game) {
+    var open = isOpen(game);
+    var myGuess = null;
+    for (var i = 0; i < state.guesses.length; i++) {
+      if (state.guesses[i].game_id === game.id && state.guesses[i].email === state.user.email) { myGuess = state.guesses[i]; break; }
+    }
+    var result = state.results[game.id];
+    var myPts = (myGuess && result) ? calcPoints(myGuess.home, myGuess.away, result.home, result.away) : null;
+    var deadline = new Date(game.kickoff.getTime() - DEADLINE_MS);
+    var deadlineStr = deadline.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
+    var gh = myGuess ? myGuess.home : '';
+    var ga = myGuess ? myGuess.away : '';
+    return '<div class="card">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">' +
+        '<div style="display:inline-flex;align-items:center;gap:6px;background:var(--brand-light);border-radius:999px;padding:4px 12px;color:var(--brand);font-size:12px;font-weight:500;">📅 ' + game.date + ', ' + game.weekday + ', às ' + game.time + '</div>' +
+        '<span class="' + (open ? 'badge-open' : 'badge-closed') + '">' + (open ? 'Aberto' : 'Encerrado') + '</span>' +
+      '</div>' +
+      '<div class="teams-row">' +
+        '<div class="flag-wrap">' + flagSVG(game.home) + '<div class="country-name">' + game.home + '</div></div>' +
+        '<div style="font-weight:800;font-size:20px;color:#6b7280;">×</div>' +
+        '<div class="flag-wrap">' + flagSVG(game.away) + '<div class="country-name">' + game.away + '</div></div>' +
+      '</div>' +
+      '<hr class="divider">' +
+      '<div style="font-size:12px;color:#6b7280;margin-bottom:' + (result ? '10px' : '0') + ';">' + (open ? 'Palpites até ' + deadlineStr + ' (30 min antes)' : 'Prazo encerrado') + '</div>' +
+      (result ? '<div style="margin-bottom:10px;font-size:13px;padding:8px 12px;background:var(--brand-light);border-radius:8px;display:flex;justify-content:space-between;align-items:center;"><span style="color:var(--brand-dark);">Resultado: <strong>' + result.home + ' × ' + result.away + '</strong></span>' + (myPts !== null ? '<span class="badge-pts">+' + myPts + ' pts</span>' : '') + '</div>' : '') +
+      (!isAdmin ? '<div style="margin-top:10px;"><div style="font-size:12px;color:#6b7280;margin-bottom:8px;">💬 Seu palpite de placar</div><div class="row"><input type="number" min="0" max="20" class="score-input" id="gh-' + game.id + '" value="' + gh + '" ' + (!open ? 'disabled' : '') + ' placeholder="0"/><span class="sep">×</span><input type="number" min="0" max="20" class="score-input" id="ga-' + game.id + '" value="' + ga + '" ' + (!open ? 'disabled' : '') + ' placeholder="0"/>' + (open ? '<button class="btn-inline" data-save-guess="' + game.id + '" style="flex:1;">Salvar palpite</button>' : '') + '</div>' + (myGuess ? '<div style="font-size:12px;color:var(--brand);margin-top:8px;font-weight:600;">✓ Registrado: ' + game.home + ' ' + myGuess.home + ' × ' + myGuess.away + ' ' + game.away + '</div>' : '') + '</div>' : '') +
+    '</div>';
   }).join('');
 }
 
 function renderRanking() {
-  const ranking = getRanking();
-  const medals = ['🥇','🥈','🥉'];
-  return `
-  <div style="font-size:13px;color:#6b7280;margin-bottom:12px;">${state.users.length} participantes cadastrados</div>
-  ${ranking.length === 0 ? '<div style="color:#6b7280;font-size:14px;">Nenhum participante ainda.</div>' : ranking.map((r, i) => `
-  <div class="card ranking-row">
-    <div class="rank-num" style="background:${i===0?'#FFF3D6':i===1?'#F0F0F0':i===2?'#FDE8D3':'var(--brand-light)'};color:${i===0?'#8B5E00':i===1?'#555':i===2?'#7A3300':'var(--brand)'};">
-      ${i < 3 ? medals[i] : i+1}
-    </div>
-    <div style="flex:1;font-weight:500;">${r.name}${r.name === state.user.name ? ' <span style="font-size:11px;background:var(--brand-light);color:var(--brand);border-radius:999px;padding:1px 7px;font-weight:600;">você</span>' : ''}</div>
-    <div style="font-weight:700;font-size:16px;color:var(--brand);">${r.pts} pts</div>
-  </div>`).join('')}
-  <div style="margin-top:12px;font-size:12px;color:#6b7280;line-height:1.9;padding:10px 14px;background:var(--brand-light);border-radius:8px;">
-    🏆 Placar exato: <strong style="color:var(--brand);">5 pts</strong> · Vencedor/empate: <strong style="color:var(--brand);">3 pts</strong> · Gols de um time: <strong style="color:var(--brand);">1 pt</strong>
-  </div>`;
+  var ranking = getRanking();
+  var medals = ['🥇','🥈','🥉'];
+  var rows = ranking.length === 0 ? '<div style="color:#6b7280;font-size:14px;">Nenhum participante ainda.</div>' :
+    ranking.map(function(r, i) {
+      var bg = i===0?'#FFF3D6':i===1?'#F0F0F0':i===2?'#FDE8D3':'var(--brand-light)';
+      var cl = i===0?'#8B5E00':i===1?'#555':i===2?'#7A3300':'var(--brand)';
+      var you = r.name === state.user.name ? ' <span style="font-size:11px;background:var(--brand-light);color:var(--brand);border-radius:999px;padding:1px 7px;font-weight:600;">você</span>' : '';
+      return '<div class="card ranking-row"><div class="rank-num" style="background:' + bg + ';color:' + cl + ';">' + (i < 3 ? medals[i] : i+1) + '</div><div style="flex:1;font-weight:500;">' + r.name + you + '</div><div style="font-weight:700;font-size:16px;color:var(--brand);">' + r.pts + ' pts</div></div>';
+    }).join('');
+  return '<div style="font-size:13px;color:#6b7280;margin-bottom:12px;">' + state.users.length + ' participantes cadastrados</div>' +
+    rows +
+    '<div style="margin-top:12px;font-size:12px;color:#6b7280;line-height:1.9;padding:10px 14px;background:var(--brand-light);border-radius:8px;">🏆 Placar exato: <strong style="color:var(--brand);">5 pts</strong> · Vencedor/empate: <strong style="color:var(--brand);">3 pts</strong> · Gols de um time: <strong style="color:var(--brand);">1 pt</strong></div>';
 }
 
 function renderAdmin() {
-  let html = `<div style="font-size:14px;font-weight:700;color:var(--brand);margin-bottom:12px;">Inserir resultados</div>`;
-  GAMES.forEach(game => {
-    const res = state.results[game.id] || { home: '', away: '' };
-    html += `<div class="card">
-      <div style="font-weight:600;margin-bottom:10px;">${game.home} × ${game.away} <span style="font-size:12px;color:#6b7280;font-weight:400;">· ${game.date}</span></div>
-      <div class="row">
-        <input type="number" min="0" max="20" class="score-input" id="rh-${game.id}" value="${res.home}" placeholder="0"/>
-        <span class="sep">×</span>
-        <input type="number" min="0" max="20" class="score-input" id="ra-${game.id}" value="${res.away}" placeholder="0"/>
-        <button class="btn-inline" data-save-result="${game.id}">Salvar</button>
-      </div>
-      ${state.results[game.id] ? `<div style="font-size:12px;color:var(--brand);margin-top:6px;font-weight:500;">✓ Atual: ${game.home} ${res.home} × ${res.away} ${game.away}</div>` : ''}
-    </div>`;
+  var html = '<div style="font-size:14px;font-weight:700;color:var(--brand);margin-bottom:12px;">Inserir resultados</div>';
+  GAMES.forEach(function(game) {
+    var res = state.results[game.id] || { home: '', away: '' };
+    html += '<div class="card"><div style="font-weight:600;margin-bottom:10px;">' + game.home + ' × ' + game.away + ' <span style="font-size:12px;color:#6b7280;font-weight:400;">· ' + game.date + '</span></div>' +
+      '<div class="row"><input type="number" min="0" max="20" class="score-input" id="rh-' + game.id + '" value="' + res.home + '" placeholder="0"/><span class="sep">×</span><input type="number" min="0" max="20" class="score-input" id="ra-' + game.id + '" value="' + res.away + '" placeholder="0"/><button class="btn-inline" data-save-result="' + game.id + '">Salvar</button></div>' +
+      (state.results[game.id] ? '<div style="font-size:12px;color:var(--brand);margin-top:6px;font-weight:500;">✓ Atual: ' + game.home + ' ' + res.home + ' × ' + res.away + ' ' + game.away + '</div>' : '') +
+    '</div>';
   });
-
-  html += `<div style="font-size:14px;font-weight:700;color:var(--brand);margin:20px 0 12px;">Gerenciar palpites</div>`;
-  GAMES.forEach(game => {
-    const gameGuesses = state.guesses.filter(g => g.game_id === game.id);
-    const result = state.results[game.id];
-    html += `<div class="card"><div style="font-weight:600;margin-bottom:8px;">${game.home} × ${game.away}</div>`;
+  html += '<div style="font-size:14px;font-weight:700;color:var(--brand);margin:20px 0 12px;">Gerenciar palpites</div>';
+  GAMES.forEach(function(game) {
+    var gameGuesses = state.guesses.filter(function(g) { return g.game_id === game.id; });
+    var result = state.results[game.id];
+    html += '<div class="card"><div style="font-weight:600;margin-bottom:8px;">' + game.home + ' × ' + game.away + '</div>';
     if (gameGuesses.length === 0) {
-      html += `<div style="font-size:13px;color:#6b7280;">Nenhum palpite ainda.</div>`;
+      html += '<div style="font-size:13px;color:#6b7280;">Nenhum palpite ainda.</div>';
     } else {
-      gameGuesses.forEach(g => {
-        const pts = result ? calcPoints(g.home, g.away, result.home, result.away) : null;
-        html += `<div class="guess-row">
-          <span style="flex:1;">${g.name}</span>
-          <span style="margin-right:8px;"><strong>${g.home}</strong> × <strong>${g.away}</strong></span>
-          ${pts !== null ? `<span style="color:var(--brand);font-weight:600;margin-right:8px;background:var(--brand-light);border-radius:999px;padding:1px 8px;">+${pts}pts</span>` : '<span style="color:#6b7280;margin-right:8px;">—</span>'}
-          <button class="btn-small" data-edit-guess="${game.id}|${g.email}" style="margin-right:4px;">Editar</button>
-          <button class="btn-danger" data-del-guess="${game.id}|${g.email}">Excluir</button>
-        </div>`;
+      gameGuesses.forEach(function(g) {
+        var pts = result ? calcPoints(g.home, g.away, result.home, result.away) : null;
+        html += '<div class="guess-row"><span style="flex:1;">' + g.name + '</span><span style="margin-right:8px;"><strong>' + g.home + '</strong> × <strong>' + g.away + '</strong></span>' +
+          (pts !== null ? '<span style="color:var(--brand);font-weight:600;margin-right:4px;background:var(--brand-light);border-radius:999px;padding:1px 8px;">+' + pts + 'pts</span>' : '<span style="color:#6b7280;margin-right:4px;">—</span>') +
+          '<button class="btn-small" data-edit-guess="' + game.id + '|' + g.email + '" style="margin-right:4px;">Editar</button>' +
+          '<button class="btn-danger" data-del-guess="' + game.id + '|' + g.email + '">Excluir</button></div>';
       });
     }
-    html += `</div>`;
+    html += '</div>';
   });
-
-  html += `<div style="font-size:14px;font-weight:700;color:var(--brand);margin:20px 0 12px;">Gerenciar usuários</div>`;
+  html += '<div style="font-size:14px;font-weight:700;color:var(--brand);margin:20px 0 12px;">Gerenciar usuários</div>';
   if (state.users.length === 0) {
-    html += `<div style="font-size:13px;color:#6b7280;">Nenhum usuário cadastrado.</div>`;
+    html += '<div style="font-size:13px;color:#6b7280;">Nenhum usuário cadastrado.</div>';
   } else {
-    state.users.forEach(u => {
-      html += `<div class="card" style="display:flex;justify-content:space-between;align-items:center;">
-        <div><div style="font-weight:500;">${u.name}</div><div style="font-size:12px;color:#6b7280;">${u.email}</div></div>
-        <div style="display:flex;gap:6px;">
-          <button class="btn-small" data-edit-user="${u.email}">Editar</button>
-          <button class="btn-danger" data-del-user="${u.email}">Excluir</button>
-        </div>
-      </div>`;
+    state.users.forEach(function(u) {
+      html += '<div class="card" style="display:flex;justify-content:space-between;align-items:center;">' +
+        '<div><div style="font-weight:500;">' + u.name + '</div><div style="font-size:12px;color:#6b7280;">' + u.email + '</div></div>' +
+        '<div style="display:flex;gap:6px;"><button class="btn-small" data-edit-user="' + u.email + '">Editar</button><button class="btn-danger" data-del-user="' + u.email + '">Excluir</button></div>' +
+      '</div>';
     });
   }
   return html;
 }
 
-// Bind events
+// Bind
 function bindLogin() {
-  document.getElementById('btn-go-register').onclick = () => setState({ screen: 'register' });
-  document.getElementById('btn-go-forgot').onclick = () => setState({ screen: 'forgot' });
-  document.getElementById('btn-login').onclick = async () => {
-    const email = document.getElementById('l-email').value.trim();
-    const pass = document.getElementById('l-pass').value;
+  document.getElementById('btn-go-register').onclick = function() { setState({ screen: 'register' }); };
+  document.getElementById('btn-go-forgot').onclick = function() { setState({ screen: 'forgot' }); };
+  document.getElementById('btn-login').onclick = function() {
+    var email = document.getElementById('l-email').value.trim();
+    var pass = document.getElementById('l-pass').value;
     setState({ lastEmail: email });
-    if (email === ADMIN_EMAIL && pass === 'verity2026') {
-      const [guesses, results, users] = await Promise.all([dbGetGuesses(), dbGetResults(), dbGetUsers()]);
-      setState({ screen: 'app', user: { name: 'Dani (Admin)', email: ADMIN_EMAIL }, guesses, results, users, tab: 'jogos' });
+    if (email === ADMIN_EMAIL && pass === ADMIN_PASS) {
+      loadAll(function(guesses, results, users) {
+        setState({ screen: 'app', user: { name: 'Dani (Admin)', email: ADMIN_EMAIL }, guesses: guesses, results: results, users: users, tab: 'jogos' });
+      });
       return;
     }
-    const { data } = await sb.from('users').select('*').eq('email', email).eq('pass', pass).single();
-    if (!data) { flash('E-mail ou senha incorretos.', 'danger'); return; }
-    const [guesses, results, users] = await Promise.all([dbGetGuesses(), dbGetResults(), dbGetUsers()]);
-    setState({ screen: 'app', user: { name: data.name, email: data.email }, guesses, results, users, tab: 'jogos' });
-  };
-}
-
-function bindForgot() {
-  document.getElementById('btn-back-login').onclick = () => setState({ screen: 'login' });
-  document.getElementById('btn-back-login2').onclick = () => setState({ screen: 'login' });
-  document.getElementById('btn-check-email').onclick = async () => {
-    const email = document.getElementById('f-email').value.trim();
-    if (!email) { flash('Informe o e-mail.', 'danger'); return; }
-    const { data } = await sb.from('users').select('email').eq('email', email).single();
-    if (!data) { flash('E-mail não encontrado.', 'danger'); return; }
-    document.getElementById('forgot-step1').style.display = 'none';
-    document.getElementById('forgot-step2').style.display = 'block';
-    document.getElementById('btn-reset-pass').dataset.email = email;
-  };
-  document.getElementById('btn-reset-pass').onclick = async (e) => {
-    const email = e.target.dataset.email;
-    const pass = document.getElementById('f-pass').value;
-    const pass2 = document.getElementById('f-pass2').value;
-    if (!pass) { flash('Informe a nova senha.', 'danger'); return; }
-    if (pass !== pass2) { flash('As senhas não coincidem.', 'danger'); return; }
-    await sb.from('users').update({ pass }).eq('email', email);
-    flash('Senha atualizada! Faça login.');
-    setTimeout(() => setState({ screen: 'login' }), 1500);
+    sb.from('users').select('*').eq('email', email).eq('pass', pass).single().then(function(r) {
+      if (!r.data) { flash('E-mail ou senha incorretos.', 'danger'); return; }
+      loadAll(function(guesses, results, users) {
+        setState({ screen: 'app', user: { name: r.data.name, email: r.data.email }, guesses: guesses, results: results, users: users, tab: 'jogos' });
+      });
+    });
   };
 }
 
 function bindRegister() {
-  document.getElementById('btn-go-login').onclick = () => setState({ screen: 'login' });
-  document.getElementById('btn-register').onclick = async () => {
-    const name = document.getElementById('r-name').value.trim();
-    const email = document.getElementById('r-email').value.trim();
-    const pass = document.getElementById('r-pass').value;
-    const pass2 = document.getElementById('r-pass2').value;
+  document.getElementById('btn-go-login').onclick = function() { setState({ screen: 'login' }); };
+  document.getElementById('btn-register').onclick = function() {
+    var name  = document.getElementById('r-name').value.trim();
+    var email = document.getElementById('r-email').value.trim();
+    var pass  = document.getElementById('r-pass').value;
+    var pass2 = document.getElementById('r-pass2').value;
     if (!name || !email || !pass) { flash('Preencha todos os campos.', 'danger'); return; }
     if (pass !== pass2) { flash('As senhas não coincidem.', 'danger'); return; }
-    const { error } = await sb.from('users').insert({ name, email, pass });
-    if (error) { flash('E-mail já cadastrado.', 'danger'); return; }
-    flash('Cadastro realizado! Faça login.');
-    setTimeout(() => setState({ screen: 'login' }), 1500);
+    sb.from('users').insert({ name: name, email: email, pass: pass }).then(function(r) {
+      if (r.error) { flash('E-mail já cadastrado.', 'danger'); return; }
+      flash('Cadastro realizado! Faça login.');
+      setTimeout(function() { setState({ screen: 'login' }); }, 1500);
+    });
+  };
+}
+
+function bindForgot() {
+  var savedEmail = '';
+  document.getElementById('btn-back-login').onclick = function() { setState({ screen: 'login' }); };
+  document.getElementById('btn-back-login2').onclick = function() { setState({ screen: 'login' }); };
+  document.getElementById('btn-check-email').onclick = function() {
+    var email = document.getElementById('f-email').value.trim();
+    if (!email) { flash('Informe o e-mail.', 'danger'); return; }
+    sb.from('users').select('email').eq('email', email).single().then(function(r) {
+      if (!r.data) { flash('E-mail não encontrado.', 'danger'); return; }
+      savedEmail = email;
+      document.getElementById('forgot-step1').style.display = 'none';
+      document.getElementById('forgot-step2').style.display = 'block';
+    });
+  };
+  document.getElementById('btn-reset-pass').onclick = function() {
+    var pass  = document.getElementById('f-pass').value;
+    var pass2 = document.getElementById('f-pass2').value;
+    if (!pass) { flash('Informe a nova senha.', 'danger'); return; }
+    if (pass !== pass2) { flash('As senhas não coincidem.', 'danger'); return; }
+    sb.from('users').update({ pass: pass }).eq('email', savedEmail).then(function() {
+      flash('Senha atualizada! Faça login.');
+      setTimeout(function() { setState({ screen: 'login' }); }, 1500);
+    });
   };
 }
 
 function bindApp() {
-  const isAdmin = state.user.email === ADMIN_EMAIL;
-
-  document.getElementById('btn-logout').onclick = () => setState({ screen: 'login', user: null });
-
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.onclick = () => setState({ tab: btn.dataset.tab });
+  var isAdmin = state.user.email === ADMIN_EMAIL;
+  document.getElementById('btn-logout').onclick = function() { setState({ screen: 'login', user: null }); };
+  document.querySelectorAll('.tab-btn').forEach(function(btn) {
+    btn.onclick = function() { setState({ tab: btn.dataset.tab }); };
   });
-
-  // Save guess
-  document.querySelectorAll('[data-save-guess]').forEach(btn => {
-    btn.onclick = async () => {
-      const gameId = parseInt(btn.dataset.saveGuess);
-      const game = GAMES.find(g => g.id === gameId);
+  document.querySelectorAll('[data-save-guess]').forEach(function(btn) {
+    btn.onclick = function() {
+      var gameId = parseInt(btn.dataset.saveGuess);
+      var game = GAMES.find(function(g) { return g.id === gameId; });
       if (!isOpen(game)) { flash('Prazo encerrado.', 'danger'); return; }
-      const gh = document.getElementById(`gh-${gameId}`).value;
-      const ga = document.getElementById(`ga-${gameId}`).value;
+      var gh = document.getElementById('gh-' + gameId).value;
+      var ga = document.getElementById('ga-' + gameId).value;
       if (gh === '' || ga === '') { flash('Preencha o placar.', 'danger'); return; }
-      await dbUpsertGuess(gameId, state.user.email, state.user.name, gh, ga);
-      state.guesses = await dbGetGuesses();
-      flash('Palpite salvo!'); render();
+      sb.from('guesses').upsert({ game_id: gameId, email: state.user.email, name: state.user.name, home: gh, away: ga }, { onConflict: 'game_id,email' }).then(function() {
+        dbGetGuesses(function(g) { state.guesses = g; flash('Palpite salvo!'); render(); });
+      });
     };
   });
-
-  // Save result
-  document.querySelectorAll('[data-save-result]').forEach(btn => {
-    btn.onclick = async () => {
-      const gameId = parseInt(btn.dataset.saveResult);
-      const rh = document.getElementById(`rh-${gameId}`).value;
-      const ra = document.getElementById(`ra-${gameId}`).value;
+  document.querySelectorAll('[data-save-result]').forEach(function(btn) {
+    btn.onclick = function() {
+      var gameId = parseInt(btn.dataset.saveResult);
+      var rh = document.getElementById('rh-' + gameId).value;
+      var ra = document.getElementById('ra-' + gameId).value;
       if (rh === '' || ra === '') { flash('Preencha o resultado.', 'danger'); return; }
-      await dbUpsertResult(gameId, rh, ra);
-      state.results = await dbGetResults();
-      flash('Resultado salvo!'); render();
+      sb.from('results').upsert({ game_id: gameId, home: rh, away: ra }, { onConflict: 'game_id' }).then(function() {
+        dbGetResults(function(r) { state.results = r; flash('Resultado salvo!'); render(); });
+      });
     };
   });
-
-  // Delete guess
-  document.querySelectorAll('[data-del-guess]').forEach(btn => {
-    btn.onclick = async () => {
-      const [gameId, email] = btn.dataset.delGuess.split('|');
-      if (!confirm(`Excluir palpite de ${email}?`)) return;
-      await dbDeleteGuess(parseInt(gameId), email);
-      state.guesses = await dbGetGuesses();
-      flash('Palpite excluído.'); render();
+  document.querySelectorAll('[data-del-guess]').forEach(function(btn) {
+    btn.onclick = function() {
+      var parts = btn.dataset.delGuess.split('|');
+      var gameId = parseInt(parts[0]), email = parts[1];
+      if (!confirm('Excluir palpite de ' + email + '?')) return;
+      sb.from('guesses').delete().eq('game_id', gameId).eq('email', email).then(function() {
+        dbGetGuesses(function(g) { state.guesses = g; flash('Palpite excluído.'); render(); });
+      });
     };
   });
-
-  // Edit guess
-  document.querySelectorAll('[data-edit-guess]').forEach(btn => {
-    btn.onclick = async () => {
-      const [gameId, email] = btn.dataset.editGuess.split('|');
-      const g = state.guesses.find(x => x.game_id === parseInt(gameId) && x.email === email);
-      const home = prompt(`Novo placar — ${GAMES.find(x=>x.id===parseInt(gameId)).home} (gols):`, g.home);
+  document.querySelectorAll('[data-edit-guess]').forEach(function(btn) {
+    btn.onclick = function() {
+      var parts = btn.dataset.editGuess.split('|');
+      var gameId = parseInt(parts[0]), email = parts[1];
+      var g = state.guesses.find(function(x) { return x.game_id === gameId && x.email === email; });
+      var game = GAMES.find(function(x) { return x.id === gameId; });
+      var home = prompt('Novo placar — ' + game.home + ' (gols):', g.home);
       if (home === null) return;
-      const away = prompt(`Novo placar — ${GAMES.find(x=>x.id===parseInt(gameId)).away} (gols):`, g.away);
+      var away = prompt('Novo placar — ' + game.away + ' (gols):', g.away);
       if (away === null) return;
-      await dbUpsertGuess(parseInt(gameId), email, g.name, home, away);
-      state.guesses = await dbGetGuesses();
-      flash('Palpite atualizado.'); render();
+      sb.from('guesses').upsert({ game_id: gameId, email: email, name: g.name, home: home, away: away }, { onConflict: 'game_id,email' }).then(function() {
+        dbGetGuesses(function(gs) { state.guesses = gs; flash('Palpite atualizado.'); render(); });
+      });
     };
   });
-
-  // Delete user
-  document.querySelectorAll('[data-del-user]').forEach(btn => {
-    btn.onclick = async () => {
-      const email = btn.dataset.delUser;
-      if (!confirm(`Excluir usuário ${email} e todos os seus palpites?`)) return;
-      await dbDeleteUser(email);
-      state.users = await dbGetUsers();
-      state.guesses = await dbGetGuesses();
-      flash('Usuário excluído.'); render();
+  document.querySelectorAll('[data-del-user]').forEach(function(btn) {
+    btn.onclick = function() {
+      var email = btn.dataset.delUser;
+      if (!confirm('Excluir usuário ' + email + ' e todos os seus palpites?')) return;
+      sb.from('guesses').delete().eq('email', email).then(function() {
+        sb.from('users').delete().eq('email', email).then(function() {
+          loadAll(function(guesses, results, users) { state.guesses = guesses; state.users = users; flash('Usuário excluído.'); render(); });
+        });
+      });
     };
   });
-
-  // Edit user
-  document.querySelectorAll('[data-edit-user]').forEach(btn => {
-    btn.onclick = async () => {
-      const origEmail = btn.dataset.editUser;
-      const u = state.users.find(x => x.email === origEmail);
-      const name = prompt('Novo nome:', u.name);
-      if (!name) return;
-      const email = prompt('Novo e-mail:', u.email);
-      if (!email) return;
-      const pass = prompt('Nova senha (deixe em branco para manter):', '');
-      await dbUpdateUser(origEmail, name, email, pass || null);
-      state.users = await dbGetUsers();
-      state.guesses = await dbGetGuesses();
-      flash('Usuário atualizado.'); render();
+  document.querySelectorAll('[data-edit-user]').forEach(function(btn) {
+    btn.onclick = function() {
+      var origEmail = btn.dataset.editUser;
+      var u = state.users.find(function(x) { return x.email === origEmail; });
+      var name = prompt('Novo nome:', u.name); if (!name) return;
+      var email = prompt('Novo e-mail:', u.email); if (!email) return;
+      var pass = prompt('Nova senha (deixe em branco para manter):', '');
+      var upd = { name: name, email: email };
+      if (pass) upd.pass = pass;
+      sb.from('users').update(upd).eq('email', origEmail).then(function() {
+        sb.from('guesses').update({ email: email, name: name }).eq('email', origEmail).then(function() {
+          loadAll(function(guesses, results, users) { state.guesses = guesses; state.users = users; flash('Usuário atualizado.'); render(); });
+        });
+      });
     };
   });
 }
 
-// Init
-window.onerror = function(msg, src, line) {
-  document.getElementById('app').innerHTML = `<div style="padding:2rem;color:red;font-family:monospace;font-size:13px;">Erro JS: ${msg}<br>Linha: ${line}</div>`;
-};
-if (typeof supabase === 'undefined') {
-  document.getElementById('app').innerHTML = `<div style="padding:2rem;color:red;font-family:sans-serif;">Erro: biblioteca Supabase não carregou. Verifique sua conexão.</div>`;
-} else {
+// Init — aguarda Supabase carregar
+function init() {
+  if (typeof supabase === 'undefined' || !supabase.createClient) {
+    setTimeout(init, 200);
+    return;
+  }
+  sb = supabase.createClient(
+    'https://jwwcnarwvixszidaaphs.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp3d2NuYXJ3dml4c3ppZGFhcGhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwMTA4ODksImV4cCI6MjA5NjU4Njg4OX0.9VRB_zjcSCMIOAHdmsDR_pINPEdbcCRGp96RiJ5B5kQ'
+  );
   render();
 }
+init();
 </script>
 </body>
 </html>
