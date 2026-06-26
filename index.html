@@ -57,6 +57,7 @@ var GAMES = [
   { id: 1, date: '13/06', weekday: 'sábado',       time: '19h00', home: 'Brasil',  away: 'Marrocos', kickoff: new Date('2026-06-13T22:00:00Z') },
   { id: 2, date: '19/06', weekday: 'sexta-feira',  time: '21h30', home: 'Brasil',  away: 'Haiti',    kickoff: new Date('2026-06-20T00:30:00Z') },
   { id: 3, date: '24/06', weekday: 'quarta-feira', time: '19h00', home: 'Escócia', away: 'Brasil',   kickoff: new Date('2026-06-24T22:00:00Z') },
+  { id: 4, date: '29/06', weekday: 'segunda-feira', time: '14h00', home: 'Brasil',  away: 'Japão',    kickoff: new Date('2026-06-29T17:00:00Z') },
 ];
 
 function isOpen(game) { return new Date() < new Date(game.kickoff.getTime() - DEADLINE_MS); }
@@ -78,6 +79,7 @@ function flagSVG(country) {
     Marrocos: '<svg width="67" height="48" viewBox="0 0 280 196" xmlns="http://www.w3.org/2000/svg"><rect width="280" height="196" fill="#C1272D" rx="6"/><polygon points="140,72 148,96 174,96 153,111 161,135 140,120 119,135 127,111 106,96 132,96" fill="none" stroke="#006233" stroke-width="4"/></svg>',
     Haiti: '<svg width="67" height="48" viewBox="0 0 280 196" xmlns="http://www.w3.org/2000/svg"><rect width="280" height="196" fill="#D21034" rx="6"/><rect width="280" height="98" fill="#00209F"/><rect x="110" y="72" width="60" height="52" fill="white"/><rect x="110" y="72" width="60" height="26" fill="#00209F"/><rect x="110" y="98" width="60" height="26" fill="#D21034"/><line x1="140" y1="56" x2="140" y2="124" stroke="#006B3F" stroke-width="4"/><ellipse cx="140" cy="58" rx="10" ry="15" fill="#006B3F"/></svg>',
     'Escócia': '<svg width="67" height="48" viewBox="0 0 280 196" xmlns="http://www.w3.org/2000/svg"><rect width="280" height="196" fill="#005EB8" rx="6"/><line x1="0" y1="0" x2="280" y2="196" stroke="white" stroke-width="38"/><line x1="280" y1="0" x2="0" y2="196" stroke="white" stroke-width="38"/></svg>',
+    'Japão': '<svg width="67" height="48" viewBox="0 0 280 196" xmlns="http://www.w3.org/2000/svg"><rect width="280" height="196" fill="white" rx="6"/><circle cx="140" cy="98" r="50" fill="#BC002D"/></svg>',
   };
   return flags[country] || '';
 }
