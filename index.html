@@ -287,8 +287,42 @@ function renderRanking() {
     '<div style="margin-top:12px;font-size:12px;color:#6b7280;line-height:1.9;padding:10px 14px;background:var(--brand-light);border-radius:8px;">🏆 Placar exato: <strong style="color:var(--brand);">5 pts</strong> · Vencedor/empate: <strong style="color:var(--brand);">3 pts</strong> · Gols de um time: <strong style="color:var(--brand);">1 pt</strong></div>';
 }
 
+function exportCSV() {
+  var rows = [['Jogo', 'Data', 'Participante', 'E-mail', 'Placar Palpite', 'Placar Resultado', 'Pontos']];
+  GAMES.forEach(function(game) {
+    var gameGuesses = state.guesses.filter(function(g) { return g.game_id === game.id; });
+    var result = state.results[game.id];
+    var label = game.home + ' x ' + game.away;
+    var resultStr = result ? (result.home + 'x' + result.away) : '';
+    if (gameGuesses.length === 0) {
+      rows.push([label, game.date, '', '', '', resultStr, '']);
+    } else {
+      gameGuesses.forEach(function(g) {
+        var pts = result ? calcPoints(g.home, g.away, result.home, result.away) : '';
+        rows.push([label, game.date, g.name, g.email, g.home + 'x' + g.away, resultStr, pts]);
+      });
+    }
+  });
+  var csv = rows.map(function(r) {
+    return r.map(function(c) {
+      var s = String(c).replace(/"/g, '""');
+      return (s.indexOf(',') > -1 || s.indexOf('"') > -1) ? '"' + s + '"' : s;
+    }).join(',');
+  }).join('\r\n');
+  var blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'palpites_veriters_' + new Date().toISOString().slice(0,10) + '.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 function renderAdmin() {
-  var html = '<div style="font-size:14px;font-weight:700;color:var(--brand);margin-bottom:12px;">Inserir resultados</div>';
+  var html = '<button class="btn-inline" id="btn-export-csv" style="width:100%;margin-bottom:16px;">📥 Exportar relatório CSV</button>';
+  html += '<div style="font-size:14px;font-weight:700;color:var(--brand);margin-bottom:12px;">Inserir resultados</div>';
   GAMES.forEach(function(game) {
     var res = state.results[game.id] || { home: '', away: '' };
     html += '<div class="card"><div style="font-weight:600;margin-bottom:10px;">' + game.home + ' × ' + game.away + ' <span style="font-size:12px;color:#6b7280;font-weight:400;">· ' + game.date + '</span></div>' +
@@ -397,6 +431,9 @@ function bindForgot() {
 function bindApp() {
   var isAdmin = state.user.email === ADMIN_EMAIL;
   document.getElementById('btn-logout').onclick = function() { setState({ screen: 'login', user: null }); };
+  if (document.getElementById('btn-export-csv')) {
+    document.getElementById('btn-export-csv').onclick = exportCSV;
+  }
   document.querySelectorAll('.tab-btn').forEach(function(btn) {
     btn.onclick = function() { setState({ tab: btn.dataset.tab }); };
   });
